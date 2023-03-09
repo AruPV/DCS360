@@ -18,13 +18,15 @@ class QueueStats:
     total_area_utilization = 0
     total_time_simulation = 0
 
-    def show_stats(self):
-
-        print(f"""# Arrivals: {self.total_arrivals}
-                # Departures: {self.total_arrivals}
-                # Arrivals: {self.total_arrivals}
-                # in System  @ end : {self.num_in_system}
-                TA #""")
+    def show_stats(self) -> None:
+        print(f"""
+# Arrivals: {self.total_arrivals}
+# Departures: {self.total_arrivals}
+# Arrivals: {self.total_arrivals}
+# in System  @ end: {self.num_in_system}
+TA # System: {self.total_area_system/self.last_event_time}
+TA # Queue: {self.total_area_queue/self.last_event_time}
+Utilization: {self.total_area_utilization/self.last_event_time}""")
     
 
 def getInterarrival() -> float:
@@ -40,11 +42,16 @@ def addArea(queue_stats: QueueStats) -> None:       # !!! TO BE CALLED BEFORE EV
 
     if queue_stats.num_in_system > 0:               #For time in system
         queue_area = base * (num_in_system-1)
-        queue_stats.total_time_queue = queue_area
+        queue_stats.total_area_queue += queue_area
     
-    system_area = base * num_in_system              #For time in queue
-    queue_stats.total_time_system = system_area
-    queue_stats.last_event_time = sim.now
+    system_area = base * num_in_system 
+    print(f"System Area {system_area}")             #For time in queue
+    queue_stats.total_area_system += system_area
+
+    utilization_area = base * (num_in_system != 0)  #For utilization
+    queue_stats.total_area_utilization += utilization_area
+
+    queue_stats.last_event_time  = sim.now
 
 
 def completionOfService(queue_stats: QueueStats, show_output: bool = True) -> None:
@@ -70,15 +77,14 @@ def arrival(queue_stats: QueueStats, show_output: bool = True) -> None:
 
 sim = simulus.simulator()
 queue_stats = QueueStats()
-max_arrivals = 100
+max_arrivals = 10
 
 
 def main() -> None:
     show_output = False
     sim.sched(arrival, queue_stats, show_output, offset = getInterarrival())
     sim.run()
-    
-
+    queue_stats.show_stats()
 
 
 if __name__ == "__main__":
