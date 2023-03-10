@@ -40,13 +40,12 @@ def addArea(queue_stats: QueueStats) -> None:       # !!! TO BE CALLED BEFORE EV
     num_in_system = queue_stats.num_in_system
     base = sim.now - queue_stats.last_event_time
 
-    if queue_stats.num_in_system > 0:               #For time in system
+    if queue_stats.num_in_system > 0:               #For time in queue
         queue_area = base * (num_in_system-1)
         queue_stats.total_area_queue += queue_area
     
     system_area = base * num_in_system 
-    print(f"System Area {system_area}")             #For time in queue
-    queue_stats.total_area_system += system_area
+    queue_stats.total_area_system += system_area     #For time in system
 
     utilization_area = base * (num_in_system != 0)  #For utilization
     queue_stats.total_area_utilization += utilization_area
@@ -77,7 +76,7 @@ def arrival(queue_stats: QueueStats, show_output: bool = True) -> None:
 
 sim = simulus.simulator()
 queue_stats = QueueStats()
-max_arrivals = 10
+max_arrivals = 10000
 
 
 def main() -> None:
@@ -86,8 +85,27 @@ def main() -> None:
     sim.run()
     queue_stats.show_stats()
 
-
 if __name__ == "__main__":
     main()
 
-
+#                simED                                              Python
+#                                       Iteration 1
+#       avgSojour: 7.3422253058348                      TA # System: 7.750992636812023
+#       avgWait: 6.44997561733926                       TA # Queue: 6.867112249563992
+#       Utilization: 0.894182966239025                  Utilization: 0.8838803872480965
+#                                       Iteration 2
+#       avgSojour: 9.15254991973473                     TA # System: 8.097060158814683
+#       avgWait: 8.24024186912559                       TA # Queue: 7.202747600904905
+#       Utilization: 0.900809635884688                  Utilization: 0.8943125579097858    
+#                                       Iteration 3
+#       avgSojour: 10.1229399708578                     TA # System: 9.14883081780474
+#       avgWait: 9.22282552902887                       TA # Queue: 8.240112736808083
+#       Utilization: 0.914456742021901                  Utilization: 0.9087180809966511
+#                                       Iteration 4
+#       avgSojour: 7.88416738484038                     TA # System: 7.737865121796885
+#       avgWait: 6.99661352706361                       TA # Queue: 6.839616856284027
+#       Utilization: 0.888739219623596                  Utilization: 0.8982482655128973
+#                                       Iteration 5
+#       avgSojour: 7.40476175161468                     TA # System: 6.801531700281764
+#       avgWait: 6.51887427884657                       TA # Queue: 5.915983959847786
+#       Utilization: 0.885179036966654                  Utilization: 0.8855477404339989
