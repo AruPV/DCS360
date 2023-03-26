@@ -1,12 +1,5 @@
 import simulus
 import random
-###Homework 
-# Get the following:
-# 1) Utilization
-# 2) Time average in queue
-# 3) Time average in system
-
-###
 
 class QueueStats:
     num_in_system = 0
