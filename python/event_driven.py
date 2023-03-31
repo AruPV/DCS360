@@ -1,5 +1,6 @@
 import simulus
 import random
+import RNG
 
 class QueueStats:
     num_in_system = 0

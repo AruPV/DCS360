@@ -1,6 +1,7 @@
 from enum import Enum
 from numpy.random import MT19937, Generator
 import numpy.typing
+import math
 
 #######################################################################################
 class Stream(Enum):
@@ -124,10 +125,8 @@ class RNG:
             Returns:
                 A single variate as a numpy.int64
         '''
-        if not (cls._initialized):
-            cls.initializeStreams()
-        generator = cls._streams[which_stream]
-        return generator.integers(a, b, endpoint = True)
+        uniform_variate = RNG.uniform(a = a-1, b = b, which_stream = which_stream)
+        return math.ceil(uniform_variate)
     
     #######################################################################################
     @classmethod
@@ -203,8 +202,13 @@ class RNG:
 ###################
 def main() -> None:
     stream = 0
-    for i in range(100):
-        print(RNG.gamma(2, 2, stream))
+    RNG.setSeed(seed = 1295472)
+    f = open("G:/My Drive/DCS/Modeling and Simulation/DCS360/variates/randint_var.txt", "x")
+
+    f.write(str(RNG.randint(a = 1, b = 100, which_stream = stream)))
+    for i in range(99999):
+        f.write(",")
+        f.write(str(RNG.randint(a = 1, b = 100, which_stream = stream)))
 
 if __name__ == "__main__":
     main()
