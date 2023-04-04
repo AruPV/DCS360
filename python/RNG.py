@@ -3,6 +3,7 @@ from numpy.random import MT19937, Generator
 import numpy.typing
 import math
 
+"""RNG is a Random Number Generator wrapper around the Numpy "Generator" class that uses the Mersenne Twister 199937"""
 #######################################################################################
 class Stream(Enum):
     ''' RNG Streams
@@ -11,7 +12,8 @@ class Stream(Enum):
     in the model) for the random number generator
     '''
     ARRIVAL    = 0
-    COMPLETION = 1
+    SERVICE_TIME = 1
+    SERVICE_PROCESS = 2
 
 #######################################################################################
 class RNG:
@@ -23,7 +25,7 @@ class RNG:
     to pull from different sets of pseudo-randomized numbers.
     '''
     #Class level variables
-    _streams: list[numpy.random.Generator]
+    _streams: list[numpy.random.Generator] = []
     _initialized: bool = False
     _seed: numpy.int64 = None
 
@@ -83,7 +85,7 @@ class RNG:
         '''
         if not (cls._initialized):
             cls.initializeStreams()
-        generator = cls._streams[which_stream]
+        generator = cls._streams[which_stream.value]
         return generator.geometric(p)
 
     #######################################################################################
@@ -103,7 +105,7 @@ class RNG:
         '''
         if not (cls._initialized):
             cls.initializeStreams()
-        generator = cls._streams[which_stream]
+        generator = cls._streams[which_stream.value]
         return generator.random()
     
     #######################################################################################
@@ -171,7 +173,7 @@ class RNG:
         '''
         if not (cls._initialized):
             cls.initializeStreams()
-        generator = cls._streams[which_stream]
+        generator = cls._streams[which_stream.value]
         return generator.exponential(mu)
 
 
@@ -196,19 +198,20 @@ class RNG:
         '''
         if not (cls._initialized):
             cls.initializeStreams()
-        generator = cls._streams[which_stream]
+        generator = cls._streams[which_stream.value]
         return generator.gamma(shape, scale)
 
 ###################
 def main() -> None:
-    stream = 0
+    stream = Stream.ARRIVAL
     RNG.setSeed(seed = 1295472)
-    f = open("G:/My Drive/DCS/Modeling and Simulation/DCS360/variates/randint_var.txt", "x")
+    print(RNG.geometric(.2, which_stream = stream))
+    f = open("G:/My Drive/DCS/Modeling and Simulation/DCS360/variates/geometric_var.txt", "x")
 
-    f.write(str(RNG.randint(a = 1, b = 100, which_stream = stream)))
+    f.write(str(RNG.geometric(p = 0.5, which_stream = stream)))
     for i in range(99999):
         f.write(",")
-        f.write(str(RNG.randint(a = 1, b = 100, which_stream = stream)))
+        f.write(str(RNG.geometric(p = 0.5, which_stream = stream)))
 
 if __name__ == "__main__":
     main()

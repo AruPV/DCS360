@@ -1,6 +1,7 @@
 import simulus
 import random
-import RNG
+from RNG import RNG
+from RNG import Stream
 
 class QueueStats:
     num_in_system = 0
@@ -11,6 +12,8 @@ class QueueStats:
     total_area_system = 0
     total_area_utilization = 0
     total_time_simulation = 0
+    capacity = 2
+    rejection_count = 0
 
     def show_stats(self) -> None:
         print(f"""
@@ -24,10 +27,42 @@ Utilization: {self.total_area_utilization/self.last_event_time}""")
     
 
 def getInterarrival() -> float:
-    return random.expovariate(1.0)
+    stream = Stream.ARRIVAL
+    return RNG.exponential(1.0, stream)
 
 def getService() -> float:
-    return random.expovariate(10/9)
+    """Determine the service time
+
+    Generates a service time by calling getTaskAmount and then getting that many
+    uniform variates
+
+        Args:
+            None
+        Returns:
+            A float of the service time
+    """
+    task_amount = getTaskAmount()
+    total_time = 0.0
+    stream = Stream.SERVICE_TIME
+    for i in range(task_amount):
+        total_time += RNG.uniform(which_stream = stream, a = 0.1, b = 0.2)
+    return total_time
+
+def getTaskAmount() -> int:
+    """ Calculate number of tasks for a service
+
+    Called prior to determining the service time. It returns the amount of 
+    tasks to be performed (and thus the amount of variates to be generated for service time)
+
+        Args:
+            None
+        Returns:
+            Returns an int equal to 1+exponential(.1)
+    """
+    stream = Stream.SERVICE_PROCESS
+    RNG.setSeed(seed = 1295472)
+    extra_tasks = RNG.geometric(which_stream = stream, p = .1)
+    return (1 + extra_tasks)
 
 
 def addArea(queue_stats: QueueStats) -> None:       # !!! TO BE CALLED BEFORE EVENT !!!
@@ -56,12 +91,22 @@ def completionOfService(queue_stats: QueueStats, show_output: bool = True) -> No
         sim.sched(completionOfService, queue_stats, show_output, offset = getService())
 
 def arrival(queue_stats: QueueStats, show_output: bool = True) -> None:
-    addArea(queue_stats)
-    queue_stats.total_arrivals += 1
     if show_output: print(f"Arrival @{sim.now}")    #print output
-    queue_stats.num_in_system += 1
-    if queue_stats.num_in_system == 1:
-        sim.sched(completionOfService, queue_stats, show_output, offset = getService())
+
+    #Deal with it as either reject or regular arrival
+    if queue_stats.num_in_system == queue_stats.capacity:   #If reject
+        if show_output: print(f"Arrival rejected @{sim.now}, There are {queue_stats.num_in_system} people in system and the capacity is {queue_stats.capacity}") 
+        queue_stats.rejection_count += 1
+    else:
+        if show_output: print(f"Arrival accepted @{sim.now}")                                                    #If accepted
+        addArea(queue_stats)
+        queue_stats.total_arrivals += 1
+        queue_stats.num_in_system += 1
+        #Is this the only person in the system?
+        if queue_stats.num_in_system == 1:
+            sim.sched(completionOfService, queue_stats, show_output, offset = getService())
+    
+    #Does the loop continue?
     if queue_stats.total_arrivals < max_arrivals:
         sim.sched(arrival, queue_stats, show_output, offset = getInterarrival())
     else:
@@ -74,10 +119,11 @@ max_arrivals = 10000
 
 
 def main() -> None:
-    show_output = False
+    show_output = True
     sim.sched(arrival, queue_stats, show_output, offset = getInterarrival())
     sim.run()
     queue_stats.show_stats()
+    print(getTaskAmount())
 
 if __name__ == "__main__":
     main()

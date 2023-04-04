@@ -1,0 +1,55 @@
+#120 questions
+#90 are Class 1 = 30 are Class 2
+# Class 1 A = .6, B = .3 , C = .1, D = 0, F = 0
+# Class 2 A = 0, B = .1, C0. = .4, D = .4, F = .1
+# Score per letter A = 4, B = 3, C = 2, D = 1, F = 0
+# 12 different questions
+
+First select which 12 questions
+
+Q1 - I 90/120 | II 30/120
+Q2 - 
+
+I,I,I,I,I
+I,I,I,I,II
+I,I,I,II,I
+I,I,
+
+recursion
+
+
+def calculate_1
+
+bool list = [NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA]
+1_amount = 90
+2_amount = 30
+probabilities = [[],[]]
+
+def probability (1_left, 2_left, index = 1, list, current_prob){
+    
+    if (index == 12){                           #End condition for recursion
+
+        append(probabilities,)
+        break
+    }
+
+    qs_left = 120 - (index - 1)                 #Calculate number of qs left and probs
+    prob_1 = (1_left/qs_left) * current_prob
+    prob_2 = (2_left/qs_left) * current_prob
+
+    list_1[index] <- True
+    list_2[index] <- False 
+
+    probability (1_left = (1_left -1),          #Picked 1
+                2_left = 2_left,
+                index = index + 1,
+                current_prob = prob_1
+                list = list_1)
+
+    probability (1_left = 1_left,               #Picked 2
+                2_left = (2_left - 1),
+                index = index + 1,
+                current_prob = prob_2
+                list = list_2)
+
+}
